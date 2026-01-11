@@ -77,9 +77,14 @@ Your Azure identity needs:
 ## NEW Foundry vs Classic Agents
 
 This project specifically uses:
-- **NEW Foundry Agent API** via `azure-ai-projects>=2.0.0b3`
-- **Agent creation** with `client.agents.create_agent()`
+- **NEW Foundry Agent API** via `azure-ai-projects>=2.0.0b3` (**beta - requires --pre flag**)
+- **Agent creation** with `client.agents.create_version()`
 - **Responses API** with agent references
 - **Portal integration** - agents appear in Foundry dashboard
+
+**Installation requirement:**
+```bash
+uv add azure-ai-projects --pre
+```
 
 **Note:** This is different from classic Azure OpenAI assistant creation patterns.

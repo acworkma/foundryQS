@@ -1,8 +1,25 @@
 # Agent Usage Guide
 
-This project demonstrates two patterns for creating and using Azure AI Foundry agents using the NEW Foundry Agent API.
+This project demonstrates multiple patterns for creating and using Azure AI Foundry agents with different language models using the NEW Foundry Agent API.
 
 ## Agent Creation Patterns
+
+### Model-Specific Agents
+
+**DeepSeek Agent (agent-deepseek.py):**
+- **Model:** DeepSeek-V3.2
+- **Agent Name:** agent-deepseek
+- **Specialization:** Reasoning, coding, and analytical responses
+
+**GPT Agent (agent-gpt.py):**
+- **Model:** gpt-5.2
+- **Agent Name:** agent-gpt
+- **Specialization:** Creative tasks, complex reasoning, natural conversation
+
+**Mistral Agent (agent-mistral.py):**
+- **Model:** Mistral-Large-3
+- **Agent Name:** agent-mistral
+- **Specialization:** Multilingual capabilities, structured responses
 
 ### Pattern 1: Environment-Driven (agent.py)
 
@@ -33,7 +50,30 @@ agent = project.agents.create_agent(
 )
 ```
 
-### Pattern 2: Direct Configuration (main.py)
+### Pattern 2: Model-Specific Configuration
+
+**Each model has dedicated agent creation with hardcoded configuration:**
+
+```python
+# Example: DeepSeek Agent
+MODEL_DEPLOYMENT_NAME = "DeepSeek-V3.2"
+AGENT_NAME = "agent-deepseek"
+
+project = AIProjectClient(
+    endpoint=os.environ["PROJECT_ENDPOINT"],
+    credential=DefaultAzureCredential()
+)
+
+agent = project_client.agents.create_version(
+    agent_name=AGENT_NAME,
+    definition=PromptAgentDefinition(
+        model=MODEL_DEPLOYMENT_NAME,
+        instructions="You are a helpful AI assistant powered by DeepSeek-V3.2. You excel at reasoning, coding, and providing detailed analytical responses.",
+    ),
+)
+```
+
+### Pattern 3: Direct Configuration (main.py)
 
 **Hardcoded configuration for specific use cases:**
 
@@ -51,6 +91,30 @@ agent = project.agents.create_agent(
     instructions="You are a creative storytelling agent. Generate one-line stories."
 )
 ```
+
+## Running Different Agents
+
+### Create All Agents
+```bash
+# Create DeepSeek agent (reasoning & coding focused)
+uv run python agent-deepseek.py
+
+# Create GPT agent (creative & conversational)  
+uv run python agent-gpt.py
+
+# Create Mistral agent (multilingual & structured)
+uv run python agent-mistral.py
+
+# Create environment-driven agent
+uv run python agent.py
+```
+
+### Model Deployment Requirements
+
+Ensure these model deployments exist in your Azure AI Foundry project:
+- **DeepSeek-V3.2** (deployment name: "DeepSeek-V3.2")
+- **gpt-5.2** (deployment name: "gpt-5.2") 
+- **Mistral-Large-3** (deployment name: "Mistral-Large-3")
 
 ## Agent Interaction Workflow
 
@@ -122,8 +186,24 @@ Uses `DefaultAzureCredential` - automatically detects:
 - Managed Identity (in Azure)
 - Service Principal environment variables
 
-## Agent Instructions
+## Agent Instructions by Model
 
+### DeepSeek Agent
+```python
+instructions="You are a helpful AI assistant powered by DeepSeek-V3.2. You excel at reasoning, coding, and providing detailed analytical responses."
+```
+
+### GPT Agent  
+```python
+instructions="You are a sophisticated AI assistant powered by GPT-5.2. You provide comprehensive, nuanced responses and excel at creative tasks, complex reasoning, and natural conversation."
+```
+
+### Mistral Agent
+```python
+instructions="You are an intelligent AI assistant powered by Mistral Large 3. You provide clear, structured responses with strong multilingual capabilities and excel at following complex instructions."
+```
+
+### Custom Instructions
 Customize agent behavior through the `instructions` parameter:
 
 ```python

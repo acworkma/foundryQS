@@ -110,16 +110,21 @@ uv run python -c "from azure.identity import DefaultAzureCredential; print(Defau
 **Problem:** Code works locally but fails in different environments
 
 **This project uses beta versions:**
-- `azure-ai-projects>=2.0.0b3` (beta)
+- `azure-ai-projects>=2.0.0b3` (beta - **requires --pre flag**)
 - NEW Foundry Agent API (cutting-edge)
 
 **Solutions:**
-1. **Pin exact versions:**
+1. **Install beta version correctly:**
+   ```bash
+   uv add azure-ai-projects --pre
+   ```
+
+2. **Pin exact versions:**
    ```bash
    uv lock --upgrade
    ```
 
-2. **Check for updates:**
+3. **Check for updates:**
    ```bash
    uv add azure-ai-projects --pre --upgrade
    ```
