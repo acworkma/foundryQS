@@ -28,18 +28,18 @@ A quickstart project for creating and managing AI agents using Microsoft Azure A
 
 3. **Run an agent creation script:**
    ```bash
-   # Create DeepSeek agent
+   # Create individual agents
    uv run python agent-deepseek.py
-   
-   # Create GPT agent  
    uv run python agent-gpt.py
-   
-   # Create Mistral agent
    uv run python agent-mistral.py
+   
+   # Create and run multi-agent coordinator workflow
+   uv run python agent-coordinator.py
    ```
 
 ## Project Structure
 
+- `agent-coordinator.py` - Multi-agent orchestrator with workflow (NEW)
 - `agent-deepseek.py` - DeepSeek-V3.2 agent creation
 - `agent-gpt.py` - GPT-5.2 agent creation  
 - `agent-mistral.py` - Mistral Large 3 agent creation

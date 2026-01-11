@@ -4,22 +4,26 @@ This project demonstrates multiple patterns for creating and using Azure AI Foun
 
 ## Agent Creation Patterns
 
-### Model-Specific Agents
+### Multi-Agent Coordinator
 
-**DeepSeek Agent (agent-deepseek.py):**
-- **Model:** DeepSeek-V3.2
-- **Agent Name:** agent-deepseek
-- **Specialization:** Reasoning, coding, and analytical responses
+**NEW: Orchestrated storytelling with multiple agents (agent-coordinator.py):**
+- **Coordinator Agent:** agent-coordinator (uses gpt-5.2)
+- **Target Agents:** agent-deepseek, agent-gpt, agent-mistral
+- **Execution:** Parallel with sequential fallback
+- **Output:** Side-by-side comparison of all agent responses
 
-**GPT Agent (agent-gpt.py):**
-- **Model:** gpt-5.2
-- **Agent Name:** agent-gpt
-- **Specialization:** Creative tasks, complex reasoning, natural conversation
-
-**Mistral Agent (agent-mistral.py):**
-- **Model:** Mistral-Large-3
-- **Agent Name:** agent-mistral
-- **Specialization:** Multilingual capabilities, structured responses
+```python
+# Coordinator orchestration pattern
+results = []
+for agent in TARGET_AGENTS:
+    conversation = openai_client.conversations.create()
+    response = openai_client.responses.create(
+        conversation=conversation.id,
+        extra_body={"agent": {"name": agent['name'], "type": "agent_reference"}},
+        input=user_input
+    )
+    results.append({"agent": agent['name'], "response": response.output_text})
+```
 
 ### Pattern 1: Environment-Driven (agent.py)
 
