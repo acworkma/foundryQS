@@ -7,7 +7,7 @@ from azure.ai.projects.models import WorkflowAgentDefinition
 load_dotenv()
 
 # Workflow agent configuration
-WORKFLOW_AGENT_NAME = "multi-agent-storytelling-workflow"
+WORKFLOW_AGENT_NAME = "story-teller-multi-agent-workflow"
 MODEL_DEPLOYMENT_NAME = "gpt-5.2"
 
 print(f"Using PROJECT_ENDPOINT: {os.environ['PROJECT_ENDPOINT']}")
@@ -18,44 +18,71 @@ project_client = AIProjectClient(
     credential=DefaultAzureCredential(),
 )
 
-# Define the multi-agent workflow using NEW Foundry YAML schema
+# Define the multi-agent workflow using the exact working YAML format
 workflow_definition = """
+kind: workflow
 trigger:
   kind: OnConversationStart
+  id: story_teller_multi_agent_workflow
   actions:
     - kind: SetVariable
-      id: set_user_input
-      variable_name: UserInput
-      variable_value: "=UserMessage(System.LastMessageText)"
-      
+      id: set_user_prompt
+      variable: Local.UserPrompt
+      value: =UserMessage(System.LastMessageText)
+    - kind: CreateConversation
+      id: create_deepseek_conversation
+      conversationId: Local.DeepSeekConversationId
+    - kind: CreateConversation
+      id: create_gpt_conversation
+      conversationId: Local.GPTConversationId
+    - kind: CreateConversation
+      id: create_mistral_conversation
+      conversationId: Local.MistralConversationId
     - kind: InvokeAzureAgent
-      id: call_deepseek
-      agent_name: agent-deepseek
-      input: "=Local.UserInput"
-      output_variable: DeepSeekResult
-      
+      id: deepseek_storyteller
+      description: DeepSeek creates a story
+      conversationId: =Local.DeepSeekConversationId
+      agent:
+        name: agent-deepseek
+      input:
+        messages: =Local.UserPrompt
+      output:
+        messages: Local.DeepSeekStory
     - kind: InvokeAzureAgent
-      id: call_gpt
-      agent_name: agent-gpt
-      input: "=Local.UserInput"
-      output_variable: GPTResult
-      
+      id: gpt_storyteller
+      description: GPT creates a story
+      conversationId: =Local.GPTConversationId
+      agent:
+        name: agent-gpt
+      input:
+        messages: =Local.UserPrompt
+      output:
+        messages: Local.GPTStory
     - kind: InvokeAzureAgent
-      id: call_mistral
-      agent_name: agent-mistral
-      input: "=Local.UserInput"
-      output_variable: MistralResult
-      
-    - kind: SetVariable
-      id: format_output
-      variable_name: FinalOutput
-      variable_value: "=Concat('🤖 MULTI-AGENT RESPONSES\\n\\n✅ DEEPSEEK:\\n', Local.DeepSeekResult, '\\n\\n✅ GPT:\\n', Local.GPTResult, '\\n\\n✅ MISTRAL:\\n', Local.MistralResult)"
-      
+      id: mistral_storyteller
+      description: Mistral creates a story
+      conversationId: =Local.MistralConversationId
+      agent:
+        name: agent-mistral
+      input:
+        messages: =Local.UserPrompt
+      output:
+        messages: Local.MistralStory
     - kind: SendActivity
-      id: send_response
-      activity:
-        type: message
-        text: "=Local.FinalOutput"
+      id: send_results_summary
+      activity: "🎯 Multi-Agent Storytelling Results - All three agents have completed their stories"
+    - kind: SendActivity
+      id: send_deepseek_story
+      activity: "🔷 DeepSeek: {Last(Local.DeepSeekStory).Text}"
+    - kind: SendActivity
+      id: send_gpt_story
+      activity: "🟢 GPT: {Last(Local.GPTStory).Text}"
+    - kind: SendActivity
+      id: send_mistral_story
+      activity: "🔶 Mistral: {Last(Local.MistralStory).Text}"
+    - kind: EndConversation
+      id: end_workflow
+name: story-teller-multi-agent-workflow
 """
 
 # Create NEW Foundry workflow agent with YAML definition
