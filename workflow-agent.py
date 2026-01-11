@@ -29,19 +29,9 @@ trigger:
       id: set_user_prompt
       variable: Local.UserPrompt
       value: =UserMessage(System.LastMessageText)
-    - kind: CreateConversation
-      id: create_deepseek_conversation
-      conversationId: Local.DeepSeekConversationId
-    - kind: CreateConversation
-      id: create_gpt_conversation
-      conversationId: Local.GPTConversationId
-    - kind: CreateConversation
-      id: create_mistral_conversation
-      conversationId: Local.MistralConversationId
     - kind: InvokeAzureAgent
       id: deepseek_storyteller
       description: DeepSeek creates a story
-      conversationId: =Local.DeepSeekConversationId
       agent:
         name: agent-deepseek
       input:
@@ -51,7 +41,6 @@ trigger:
     - kind: InvokeAzureAgent
       id: gpt_storyteller
       description: GPT creates a story
-      conversationId: =Local.GPTConversationId
       agent:
         name: agent-gpt
       input:
@@ -61,7 +50,6 @@ trigger:
     - kind: InvokeAzureAgent
       id: mistral_storyteller
       description: Mistral creates a story
-      conversationId: =Local.MistralConversationId
       agent:
         name: agent-mistral
       input:
